@@ -65,7 +65,7 @@ export async function removeEbeanEnhancement(wsConfig : vscode.WorkspaceConfigur
 	return new ConfigUpdate(updatedConfigs, requiresUpdate);
 }
 
-export async function updateConfigurations(wsConfig : vscode.WorkspaceConfiguration, _ws : vscode.WorkspaceFolder) : Promise<ConfigUpdate> {
+export async function updateConfigurations(wsConfig : vscode.WorkspaceConfiguration, _ws : vscode.WorkspaceFolder, agentPath : string) : Promise<ConfigUpdate> {
 	let setupNew : boolean = false;
 	let updatedConfigs : ConfigurationObject[] = [];
 	const launchConfigs = wsConfig.configurations;
@@ -87,14 +87,14 @@ export async function updateConfigurations(wsConfig : vscode.WorkspaceConfigurat
 		const validConfigs = Object.keys(configMap);
 		let updated : ConfigurationObject;
 		if (validConfigs.length === 1) {
-			updated = addJavaAgentVmArg(configMap[validConfigs[0]]);
+			updated = addJavaAgentVmArg(configMap[validConfigs[0]], agentPath);
 
 		} else if (validConfigs.length > 1) {
 			// TODO:: Handle all config change
 			validConfigs.push(ENHANCE_ALL);
 			const ebeanConfig = await vscode.window.showQuickPick(validConfigs, { ignoreFocusOut: true, placeHolder: Msg.SELECT_LAUNCH_CONFIG });
 			if (ebeanConfig) {
-				updated = addJavaAgentVmArg(configMap[ebeanConfig]);
+				updated = addJavaAgentVmArg(configMap[ebeanConfig], agentPath);
 
 			} else {
 				vscode.window.showWarningMessage(Msg.SETTING_NEW_CONFIG);
@@ -121,14 +121,14 @@ export async function validateMainClass(inputClass : string) {
 	return (mcUri.length == 0) ? `No java file with name ${inputClass} was found` : undefined;
 }
 
-export function addJavaAgentVmArg(config : ConfigurationObject) {
+export function addJavaAgentVmArg(config : ConfigurationObject, agentPath : string) {
 	if (!config.vmArgs) {
 		config.vmArgs = [];
 	}
 	let hasArg = false;
 	config.vmArgs.forEach((arg) => hasArg = hasArg || _vmArgRegex.test(arg) );
 	if (!hasArg) {
-		config.vmArgs.push("-javaagent:/Users/shabirmean/Library/Application Support/IntelliJIdea2019.3/ebean-idea/lib/ebean-agent-12.1.8.jar");
+		config.vmArgs.push(`-javaagent:${agentPath}/ebean-agent-12.1.8.jar`);
 	} else {
 		vscode.window.showInformationMessage(Msg.ALREADY_ENABLED);
 	}
