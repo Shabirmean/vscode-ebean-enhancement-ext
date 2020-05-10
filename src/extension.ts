@@ -58,15 +58,17 @@ export async function activate(context: vscode.ExtensionContext) {
 		const enabled = vscode.workspace.getConfiguration(undefined, _ws).get('ebean.enhancement.enable', wsUri);
 		if (!enabled) {
 			const wsroot = wsUri.fsPath;
+			await vscode.workspace.fs.createDirectory(vscode.Uri.file(`${wsroot}/${_vscode}`));
+			
 			const wsEdit = new vscode.WorkspaceEdit();
-			wsEdit.createFile(vscode.Uri.file(`${wsroot}/${_vscode}`), { ignoreIfExists: true });
 			wsEdit.createFile(vscode.Uri.file(`${wsroot}/${_vscode}/${_launchJson}`), { ignoreIfExists: true });
 			const created = await vscode.workspace.applyEdit(wsEdit);
-			if (!created) {
+			if (created) {
+				await vscode.workspace.saveAll(true);
+				await vscode.workspace.getConfiguration(undefined, _ws).update('ebean.enhancement.enable', true, vscode.ConfigurationTarget.WorkspaceFolder);
+			} else {
 				vscode.window.showErrorMessage(Msg.LAUNCH_JSON_CREATE_FAIL + wsroot);
-				return;
 			}
-			await vscode.workspace.getConfiguration(undefined, _ws).update('ebean.enhancement.enable', true, vscode.ConfigurationTarget.WorkspaceFolder);
 		} else {
 			vscode.window.showWarningMessage(Msg.EBEAN_ALREADY_ENABLED);
 		}
