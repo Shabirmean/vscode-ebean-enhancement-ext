@@ -1,8 +1,8 @@
 {
 	"name": "ebean-enhancement",
-	"displayName": "Ebean Enhancer for Java",
+	"displayName": "Ebean Enhancement 11 plugin for Java",
 	"publisher": "Shabirmean",
-	"description": "An enhancement plugin for the Ebean ORM for Java. Modifies java runtime arguments to use the ebean-agent jar",
+	"description": "An enhancement plugin for the Ebean ORM for Java. Modifies java runtime arguments to use the ebean-agent jar.",
 	"version": "0.0.1",
 	"engines": {
 		"vscode": "^1.45.0"
@@ -31,12 +31,12 @@
 		],
 		"commands": [
 			{
-				"command": "ebean.enableEnhancement",
-				"title": "Enable Ebean Enhancement"
+				"title": "Enable Ebean Enhancement",
+				"command": "ebean.enableEnhancement"
 			},
 			{
-				"command": "ebean.disableEnhancement",
-				"title": "Disable Ebean Enhancement"
+				"title": "Disable Ebean Enhancement",
+				"command": "ebean.disableEnhancement"
 			}
 		]
 	},
