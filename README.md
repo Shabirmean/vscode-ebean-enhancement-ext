@@ -1,65 +1,38 @@
-# helloworld README
+# Java Ebean Enhancement 11 for VS Code
 
-This is the README for your extension "helloworld". After writing up a brief description, we recommend including the following sections.
+This extension provides bean enhancement for Ebean ORM based java projects. It acheives the same functionality as the [Ebean Enhance for IntelliJ IDEA](https://github.com/ebean-orm-tools/ebean-idea-enhancer). The ebean enhancement is commonly acheived by running any Ebean based java project against the `ebean java agent`. Thus, this extension acheives the functionality of installing the required `java agent` to the local VS Code storage and enabling users to setup specific run configurations to use this agent.
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
-
-For example if there is an image subfolder under your extension project workspace:
-
-\!\[feature X\]\(images/feature-x.png\)
-
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+- Set up Ebean enhancement to any specific project in the current VS Code workspace
+- If you workspace already has multiple run configurations, then choose the specific configuration to which you want to enable ebean enhancement
+- Disable enhancement from any **worksapce + run configuration** you want
 
 ## Requirements
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+- VS Code: 1.45.0 or above
 
 ## Extension Settings
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
 This extension contributes the following settings:
 
-* `myExtension.enable`: enable/disable this extension
-* `myExtension.thing`: set to `blah` to do something
+* `ebean.enhancement.enable`: enable/disable ebean enhancement
+
+> Note: This extension setting is workspace folder specific. So each open workspace can have its own configuration for this setting in its `.vscode/settings.json`
 
 ## Known Issues
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+- If the current workspace already has multiple run configurations, then an option is provided to enable ebean enhancement to all of them. However, the implementation to this is yet to be completed. Currently only selection of individual configurations work.
 
 ## Release Notes
 
-Users appreciate release notes as you update your extension.
 
 ### 1.0.0
 
-Initial release of ...
+- Initial release of the Ebean Enhancer 11 for VS Code
+- Supports setting up ebean enhancement to speciifc workspacess if multiple are open
+- Supports setting up ebean enhancement to specific run configuration if multiple configurations are setup
 
-### 1.0.1
+## Issues and request
 
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
------------------------------------------------------------------------------------------------------------
-
-## Working with Markdown
-
-**Note:** You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+CMD+V` on macOS or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (macOS) to see a list of Markdown snippets
-
-### For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+Submit your issues and requests [here](https://github.com/Shabirmean/vscode-ebean-enhancement-ext/issues)
