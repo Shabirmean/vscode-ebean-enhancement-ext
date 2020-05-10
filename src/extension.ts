@@ -1,10 +1,8 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 
 const Msg = {
 	NO_FOLDER_OPEN: 'Failed to enable ebean enhancement. You must have a workspace setup by openning a folder to enable Ebean Enhancement',
-	NO_VAID_WS_FOLDER: 'Failed to enable ebean enhancement. No valid workspace found to enable Ebean Enhancement',
+	NO_VAID_WS_FOLDER: 'Failed to enable ebean enhancement. No valid workspace selected to enable Ebean Enhancement',
 	PICK_A_WS_FOLDER: 'Select the workspace in which you want Ebean Enhancement to be enabled',
 	LAUNCH_JSON_CREATE_FAIL: 'Failed to enable ebean enhancement. Could not create launch.json in workspace at: ',
 	EBEAN_ENABLED: 'Ebean Enhancement has been enabled',
@@ -21,15 +19,9 @@ const ENHANCE_ALL = 'Enhance all';
 const _vscode = '.vscode';
 const _launch = 'launch';
 const _launchJson = `${_launch}.json`;
+const _vmArgRegex = /^-javaagent:.*ebean-agent.*\.jar$/;
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "helloworld" is now active!');
-
 	let ebeanEnhance = vscode.commands.registerCommand('ebean.enableEnhancement', async () => {
 		let created = false;
 		const wsf = vscode.workspace.workspaceFolders;
@@ -61,68 +53,24 @@ export function activate(context: vscode.ExtensionContext) {
 		
 		if (!enabled) {
 			await vscode.workspace.getConfiguration(undefined, _ws).update('ebean.enhancement.enable', true, vscode.ConfigurationTarget.WorkspaceFolder);
-			vscode.window.showInformationMessage(Msg.EBEAN_ENABLED);
 		} else {
 			vscode.window.showWarningMessage(Msg.EBEAN_ALREADY_ENABLED);
+			return;
 		}
 		
-		const launchConfigs = vscode.workspace.getConfiguration(_launch, _ws).configurations;
-		let setupNew : boolean = false;
-		let updatedConfigs : ConfigurationObject[] = [];
-
-		if (launchConfigs && launchConfigs.length !== 0) {
-			type ConfigMap = Record<string, ConfigurationObject>;
-			let configMap : ConfigMap = {};
-			launchConfigs.forEach((curr : ConfigurationObject) => {
-				if (curr.name && curr.type && curr.type === JAVA) {
-					configMap[curr.name] = curr;
-				} else {
-					updatedConfigs.push(curr);
-				}
-			});
-
-			const validConfigs = Object.keys(configMap);
-			let updated : ConfigurationObject;
-			if (validConfigs.length === 1) {
-				updated = addJavaAgentVmArg(configMap[validConfigs[0]]);
-
-			} else if (validConfigs.length > 1) {
-				// TODO:: Handle all config change
-				validConfigs.push(ENHANCE_ALL);
-				const ebeanConfig = await vscode.window.showQuickPick(validConfigs, { ignoreFocusOut: true, placeHolder: Msg.SELECT_LAUNCH_CONFIG });
-				if (ebeanConfig) {
-					updated = addJavaAgentVmArg(configMap[ebeanConfig]);
-
-				} else {
-					vscode.window.showWarningMessage(Msg.SETTING_NEW_CONFIG);
-					setupNew = true;
-				}
-			}
-
-			Object.keys(configMap).forEach((c : string) => {
-				if (configMap[c].name === updated.name) {
-					updatedConfigs.push(updated);
-				} else {
-					updatedConfigs.push(configMap[c]);
-				}
-			});
-		} else {
-			await refreshLaunchFile(_ws);
-			setupNew = true;
-		}
-
-		let updatedLaunch;
-		if (!setupNew) {
-			updatedLaunch = { "configurations": updatedConfigs };
-			await refreshLaunchFile(_ws);
-
-		} else {
+		const wsConfigs = vscode.workspace.getConfiguration(_launch, _ws);
+		const update = await updateConfigurations(wsConfigs, _ws);
+		const updatedConfigs = update.config;
+		const setupNew = update.setupStatus;
+		
+		let updatedLaunch = { ...wsConfigs, 'configurations': updatedConfigs };
+		if (setupNew) {
 			const inputOptions : vscode.InputBoxOptions = { 
 				placeHolder: Msg.MAIN_CLASS, prompt: Msg.MAIN_CLASS_PROMPT, ignoreFocusOut: true, validateInput: validateMainClass };
 			const _mainClass : string | undefined = await vscode.window.showInputBox(inputOptions);
 			if (!_mainClass) vscode.window.showWarningMessage(Msg.SETTING_EMPTY_MAIN_CLASS);
 			const newConfig : ConfigurationObject = addJavaAgentVmArg(new ConfigurationObject().of('Ebean enhanced configuration', _mainClass || '', []));
-			updatedLaunch = { "configurations": [newConfig] };
+			updatedLaunch.configurations = [newConfig];
 		}
 		const confEdit = new vscode.WorkspaceEdit();
 		const launchJson = JSON.stringify(updatedLaunch, null, 2);
@@ -131,6 +79,10 @@ export function activate(context: vscode.ExtensionContext) {
 		confEdit.replace(vscode.Uri.file(`${_ws.uri.fsPath}/${_vscode}/${_launchJson}`), new vscode.Range(start, end), launchJson);
 		await vscode.workspace.applyEdit(confEdit);
 		await vscode.workspace.saveAll(true);
+
+		if (enabled) {
+			vscode.window.showInformationMessage(Msg.EBEAN_ENABLED);
+		}
 	});
 
 	context.subscriptions.push(ebeanEnhance);
@@ -141,11 +93,53 @@ export function deactivate() {
 	vscode.window.showErrorMessage('You must have a workspace setup by openning a folder to ebanle Ebean Enhancement');
 }
 
-async function validateMainClass(inputClass : string) {
-	// method must return undefined if the input is valid
-	const classPath = inputClass.split('.').join('/');
-	const mcUri : vscode.Uri[] = await vscode.workspace.findFiles(`**/${classPath}.java`, '**/target/**', 10);
-	return (mcUri.length == 0) ? `No java file with name ${inputClass} was found` : undefined;
+
+async function updateConfigurations(wsConfig : vscode.WorkspaceConfiguration, _ws : vscode.WorkspaceFolder) {
+	let setupNew : boolean = false;
+	let updatedConfigs : ConfigurationObject[] = [];
+	const launchConfigs = wsConfig.configurations;
+
+	if (launchConfigs && launchConfigs.length !== 0) {
+		type ConfigMap = Record<string, ConfigurationObject>;
+		let configMap : ConfigMap = {};
+		launchConfigs.forEach((curr : ConfigurationObject) => {
+			if (curr.name && curr.type && curr.type === JAVA) {
+				configMap[curr.name] = curr;
+			} else {
+				updatedConfigs.push(curr);
+			}
+		});
+
+		const validConfigs = Object.keys(configMap);
+		let updated : ConfigurationObject;
+		if (validConfigs.length === 1) {
+			updated = addJavaAgentVmArg(configMap[validConfigs[0]]);
+
+		} else if (validConfigs.length > 1) {
+			// TODO:: Handle all config change
+			validConfigs.push(ENHANCE_ALL);
+			const ebeanConfig = await vscode.window.showQuickPick(validConfigs, { ignoreFocusOut: true, placeHolder: Msg.SELECT_LAUNCH_CONFIG });
+			if (ebeanConfig) {
+				updated = addJavaAgentVmArg(configMap[ebeanConfig]);
+
+			} else {
+				vscode.window.showWarningMessage(Msg.SETTING_NEW_CONFIG);
+				setupNew = true;
+			}
+		}
+
+		Object.keys(configMap).forEach((c : string) => {
+			if (updated && updated.name == configMap[c].name) {
+				updatedConfigs.push(updated);
+			} else {
+				updatedConfigs.push(configMap[c]);
+			}
+		});
+	} else {
+		setupNew = true;
+	}
+	await refreshLaunchFile(_ws);
+	return { config: updatedConfigs, setupStatus: setupNew };
 }
 
 
@@ -153,8 +147,21 @@ function addJavaAgentVmArg(config : ConfigurationObject) {
 	if (!config.vmArgs) {
 		config.vmArgs = [];
 	}
-	config.vmArgs.push("-javaagent:/Users/shabirmean/Library/Application Support/IntelliJIdea2019.3/ebean-idea/lib/ebean-agent-12.1.8.jar");
+	let hasArg = false;
+	config.vmArgs.forEach((arg) => hasArg = hasArg || _vmArgRegex.test(arg) );
+	if (!hasArg) {
+		config.vmArgs.push("-javaagent:/Users/shabirmean/Library/Application Support/IntelliJIdea2019.3/ebean-idea/lib/ebean-agent-12.1.8.jar");
+	} else {
+		vscode.window.showInformationMessage('Ebean Enhancement is already enabled for the selected workspace configuration');
+	}
 	return config;
+}
+
+async function validateMainClass(inputClass : string) {
+	// method must return undefined if the input is valid
+	const classPath = inputClass.split('.').join('/');
+	const mcUri : vscode.Uri[] = await vscode.workspace.findFiles(`**/${classPath}.java`, '**/target/**', 10);
+	return (mcUri.length == 0) ? `No java file with name ${inputClass} was found` : undefined;
 }
 
 async function refreshLaunchFile(_ws : vscode.WorkspaceFolder) {
