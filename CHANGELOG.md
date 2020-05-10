@@ -1,9 +1,7 @@
 # Change Log
 
-All notable changes to the "helloworld" extension will be documented in this file.
+All notable changes to the "ebean-enhancement" plugin will be documented in this file.
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+## [1.0.0]
 
-## [Unreleased]
-
-- Initial release
+- Initial release of the Java Ebean Enhancement 11 plugin for vscode

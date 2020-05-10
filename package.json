@@ -3,7 +3,7 @@
 	"displayName": "Ebean Enhancement 11 plugin for Java",
 	"publisher": "Shabirmean",
 	"description": "An enhancement plugin for the Ebean ORM for Java. Modifies java runtime arguments to use the ebean-agent jar.",
-	"version": "0.0.1",
+	"version": "1.0.0",
 	"engines": {
 		"vscode": "^1.45.0"
 	},
