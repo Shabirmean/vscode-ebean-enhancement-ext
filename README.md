@@ -42,3 +42,8 @@ This extension contributes the following settings:
 ## Issues and request
 
 Submit your issues and requests [here](https://github.com/Shabirmean/vscode-ebean-enhancement-ext/issues)
+
+## Acknowledgements
+
+- The authors of the Ebean Enhancement plugin for IntelliJ _(the functionality was reversed engineered from their source code)_
+- The [Ebean-ORM](https://github.com/ebean-orm/ebean-orm.github.io) website source _(the icon for the extension is fetched from here)_
