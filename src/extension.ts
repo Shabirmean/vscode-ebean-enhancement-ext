@@ -34,7 +34,7 @@ export async function activate(context: vscode.ExtensionContext) {
 				fsErr = error;
 			}
 		}
-	})
+	});
 
 	if (fsErr) {
 		throw fsErr;
@@ -98,8 +98,13 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	const ebeanEnhancementChangeEvent = vscode.workspace.onDidChangeConfiguration(async (e) => {
 		const wsf = vscode.workspace.workspaceFolders;
-		if (!wsf) return;
-		if (wsf.length == 0) return;
+		if (!wsf) {
+			return;
+		}
+
+		if (wsf.length === 0) {
+			return;
+		}
 
 		wsf.forEach(async (_ws) => {
 			if (e.affectsConfiguration('ebean.enhancement.enable', _ws)) {
@@ -115,7 +120,9 @@ export async function activate(context: vscode.ExtensionContext) {
 						const inputOptions : vscode.InputBoxOptions = { 
 							placeHolder: Msg.MAIN_CLASS, prompt: Msg.MAIN_CLASS_PROMPT, ignoreFocusOut: true, validateInput: validateMainClass };
 						const _mainClass : string | undefined = await vscode.window.showInputBox(inputOptions);
-						if (!_mainClass) vscode.window.showWarningMessage(Msg.SETTING_EMPTY_MAIN_CLASS);
+						if (!_mainClass) {
+							vscode.window.showWarningMessage(Msg.SETTING_EMPTY_MAIN_CLASS);
+						}
 						const newConfig : ConfigurationObject = addJavaAgentVmArg(new ConfigurationObject('Ebean enhanced configuration', _mainClass || '', []),  globalStoragePath.path);
 						updatedLaunch.configurations = [newConfig];
 					}

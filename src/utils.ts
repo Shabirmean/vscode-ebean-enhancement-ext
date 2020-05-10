@@ -25,7 +25,7 @@ export const Msg = {
 	SETTING_NEW_CONFIG: 'The selected configuration was invalid. Setting up a new one...',
 	SETTING_EMPTY_MAIN_CLASS: 'Provided mainClass was invalid. Creating ebean enhancement configuration with empty mainClass. Please update it!',
 	ALREADY_ENABLED: 'Ebean Enhancement is already enabled for the selected workspace configuration',
-}
+};
 
 export async function writeUpdates(updatedLaunch : vscode.WorkspaceConfiguration, _ws : vscode.WorkspaceFolder) {
 	const confEdit = new vscode.WorkspaceEdit();
@@ -103,7 +103,7 @@ export async function updateConfigurations(wsConfig : vscode.WorkspaceConfigurat
 		}
 
 		Object.keys(configMap).forEach((c : string) => {
-			if (updated && updated.name == configMap[c].name) {
+			if (updated && updated.name === configMap[c].name) {
 				updatedConfigs.push(updated);
 			} else {
 				updatedConfigs.push(configMap[c]);
@@ -118,7 +118,7 @@ export async function validateMainClass(inputClass : string) {
 	// method must return undefined if the input is valid
 	const classPath = inputClass.split('.').join('/');
 	const mcUri : vscode.Uri[] = await vscode.workspace.findFiles(`**/${classPath}.java`, '**/target/**', 10);
-	return (mcUri.length == 0) ? `No java file with name ${inputClass} was found` : undefined;
+	return (mcUri.length === 0) ? `No java file with name ${inputClass} was found` : undefined;
 }
 
 export function addJavaAgentVmArg(config : ConfigurationObject, agentPath : string) {
