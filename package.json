@@ -7,7 +7,7 @@
 	"icon": "logo-200.png",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/ebean-orm/ebean-orm.github.io/tree/master/images"
+		"url": "https://github.com/Shabirmean/vscode-ebean-enhancement-ext"
 	},
 	"engines": {
 		"vscode": "^1.45.0"
