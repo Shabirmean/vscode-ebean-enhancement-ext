@@ -32,6 +32,9 @@ This extension contributes the following settings:
 
 ## Release Notes
 
+### 1.0.1
+
+- Fixed bug with the ebean-agent jar not being copied into the build in the first release
 
 ### 1.0.0
 
