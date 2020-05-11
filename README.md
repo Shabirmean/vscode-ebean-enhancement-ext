@@ -9,9 +9,9 @@ This extension provides bean enhancement for Ebean ORM based java projects. It a
 - If you workspace already has multiple run configurations, then choose the specific configuration to which you want to enable ebean enhancement
 - Toggle between `Enable/Disable` from the command pallette 
 
-![Settings menu](https://github.com/Shabirmean/vscode-ebean-enhancement-ext/tree/master/src/resources/settingsUi.png "Ebean Enhancement from the settings UI")
+![Settings menu](./src/resources/settingsUi.png "Ebean Enhancement from the settings UI")
 
-![Command Pallette](https://github.com/Shabirmean/vscode-ebean-enhancement-ext/tree/master/src/resources/commandPalette.png "Ebean Enhancement from the command pallette")
+![Command Pallette](./src/resources/commandPalette.png "Ebean Enhancement from the command pallette")
 
 
 ## Requirements

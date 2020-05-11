@@ -4,7 +4,7 @@
 	"publisher": "Shabirmean",
 	"description": "An enhancement plugin for the Ebean ORM for Java. Modifies java runtime arguments to use the ebean-agent jar.",
 	"version": "1.0.0",
-	"icon": "logo-200.png",
+	"icon": "./src/resources/logo-200.png",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/Shabirmean/vscode-ebean-enhancement-ext"
