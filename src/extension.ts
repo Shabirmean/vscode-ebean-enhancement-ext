@@ -11,7 +11,7 @@ import {
 const _vscode = '.vscode';
 const _launch = 'launch';
 const _launchJson = `${_launch}.json`;
-const _resources = 'src/resources';
+const _agentPath = 'ebean-agent';
 
 const FILE_EXISTS = 'FileExists';
 let globalStoragePath : vscode.Uri;
@@ -21,13 +21,13 @@ export async function activate(context: vscode.ExtensionContext) {
 	globalStoragePath =  vscode.Uri.file(context.globalStoragePath);
 	await vscode.workspace.fs.createDirectory(globalStoragePath);
 
-	const resourcesPath : vscode.Uri = vscode.Uri.file(`${context.extensionPath}/${_resources}`);
+	const resourcesPath : vscode.Uri = vscode.Uri.file(`${context.extensionPath}/${_agentPath}`);
 	ebeanFiles = await vscode.workspace.fs.readDirectory(resourcesPath);
 	let fsErr : vscode.FileSystemError | undefined = undefined;
 
 	ebeanFiles.forEach(async (f) => {
 		try {
-			const fUri : vscode.Uri = vscode.Uri.file(`${context.extensionPath}/${_resources}/${f[0]}`);
+			const fUri : vscode.Uri = vscode.Uri.file(`${context.extensionPath}/${_agentPath}/${f[0]}`);
 			await vscode.workspace.fs.copy(fUri, vscode.Uri.joinPath(globalStoragePath, `/${f[0]}`), { overwrite: false });
 		} catch (error) {
 			if (error.code !== FILE_EXISTS) {
