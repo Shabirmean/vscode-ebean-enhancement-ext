@@ -52,7 +52,7 @@
 		"watch": "tsc -watch -p ./",
 		"pretest": "npm run compile && npm run lint",
 		"test": "node ./out/test/runTest.js",
-		"copy": "mkdir ./ebean-agent && cp ./src/resources/* ./ebean-agent/"
+		"copy": "mkdir -p ./ebean-agent && cp ./src/resources/* ./ebean-agent/"
 	},
 	"devDependencies": {
 		"@types/vscode": "^1.45.0",
